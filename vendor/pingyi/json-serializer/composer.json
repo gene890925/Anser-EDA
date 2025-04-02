@@ -1,0 +1,39 @@
+{
+    "name": "pingyi/json-serializer",
+    "description": "Mixed of two repositories for serializing and unserializing PHP variables, object and closure.",
+    "keywords": [
+		"php",
+		"json",
+        "serialize",
+        "serializer",
+        "closure"
+	],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ping Yi",
+            "homepage": "https://github.com/ping-yee"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php" : "^7.4||^8.0",
+        "zumba/json-serializer": "^3.0",
+        "laravel/serializable-closure": "^1.2",
+        "jeremeamia/superclosure": "^2.4"
+    },
+    "autoload": {
+		"psr-4": {
+            "Pingyi\\JsonSerializer\\ClosureSerializer\\": "src/ClosureSerializer/",
+            "Pingyi\\JsonSerializer\\Exception\\": "src/Exception/",
+            "Pingyi\\JsonSerializer\\Test\\": "tests/"
+		}
+	},
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "friendsofphp/php-cs-fixer": "^3.14",
+        "phpstan/phpstan": "^1.9",
+        "rector/rector": "^0.15.10"
+    }
+}

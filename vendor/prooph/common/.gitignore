@@ -1,0 +1,11 @@
+/.settings
+/.project
+/.buildpath
+/vendor
+.idea
+.php_cs.cache
+/docs/html
+nbproject
+composer.lock
+.phpunit.result.cache
+.phpcs-cache

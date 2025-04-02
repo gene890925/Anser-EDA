@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+    app:
+        container_name: app
+        image: webdevops/php-nginx-dev:8.1
+        platform: linux/x86_64
+        ports:
+            - 80:80
+        working_dir: /app
+        volumes:
+            - './:/app'
+        depends_on:
+            - rabbitmq
+            - eventstoredb
+        environment:
+            RABBITMQ_HOST: rabbitmq
+            RABBITMQ_PORT: 5672
+            RABBITMQ_USER: root
+            RABBITMQ_PASS: root
+            EVENTSTOREDB_HOST: eventstoredb
+            EVENTSTOREDB_PORT: 2113
+            PHP_DISPLAY_ERRORS: "On"           # 開啟錯誤顯示
+            PHP_ERROR_REPORTING: "E_ALL"      # 顯示所有錯誤
+        networks:
+            - anser_project_network
+    rabbitmq:
+        container_name: rabbitmq
+        image: 'rabbitmq:management'
+        environment:
+            RABBITMQ_DEFAULT_USER: root
+            RABBITMQ_DEFAULT_PASS: root
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+        networks:
+            - anser_project_network
+
+    eventstoredb:
+        container_name: eventstoredb
+        image: eventstore/eventstore:latest
+        environment:
+            EVENTSTORE_CLUSTER_SIZE: 1
+            EVENTSTORE_RUN_PROJECTIONS: All
+            EVENTSTORE_START_STANDARD_PROJECTIONS: "true"
+            EVENTSTORE_INSECURE: "true"
+            EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP: "true"
+        ports:
+            - '1113:1113' # TCP 客戶端通信
+            - '2113:2113' # HTTP API 接口
+        networks:
+            - anser_project_network
+
+networks:
+    anser_project_network:
+        external: true

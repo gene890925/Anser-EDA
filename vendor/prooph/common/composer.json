@@ -1,0 +1,53 @@
+{
+    "name": "prooph/common",
+    "description": "Common classes used across prooph packages",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Alexander Miertsch",
+            "email": "kontakt@codeliner.ws"
+        },
+        {
+            "name": "Sascha-Oliver Prolic",
+            "email": "saschaprolic@googlemail.com"
+        }
+    ],
+    "keywords": [
+        "prooph",
+        "common"
+    ],
+    "homepage": "http://getprooph.org/",
+    "license": "BSD-3-Clause",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "ramsey/uuid": "4.1.2 || ^4.3",
+        "beberlei/assert": "^2.7.1 || ^3.0"
+    },
+    "require-dev": {
+        "php-coveralls/php-coveralls": "^2.2",
+        "phpunit/phpunit": "^9.5.5",
+        "prooph/bookdown-template": "^0.2.3",
+        "prooph/php-cs-fixer-config": "^0.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Prooph\\Common\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ProophTest\\Common\\": "tests"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "php-cs-fixer fix -v --diff --dry-run",
+        "cs-fix": "php-cs-fixer fix -v --diff",
+        "test": "phpunit --colors=always"
+    }
+}
