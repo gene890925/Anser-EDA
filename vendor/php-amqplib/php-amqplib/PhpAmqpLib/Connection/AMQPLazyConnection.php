@@ -1,20 +1,9 @@
 <?php
+
 namespace PhpAmqpLib\Connection;
 
 class AMQPLazyConnection extends AMQPStreamConnection
 {
-    /**
-     * Gets socket from current connection
-     *
-     * @deprecated
-     */
-    public function getSocket()
-    {
-        $this->connect();
-
-        return parent::getSocket();
-    }
-
     /**
      * {@inheritdoc}
      */

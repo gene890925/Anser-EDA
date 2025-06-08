@@ -4,15 +4,14 @@ namespace App\Framework;
 
 use ReflectionClass;
 use ReflectionMethod;
-use App\Framework\HandlerScannerInterface;
 use App\Framework\EventBus;
 
 /**
  * Class HandlerScanner
  * 用於自動掃描 `Saga` 事件處理類別，並自動註冊標記為 `#[EventHandler]` 的方法。
- * 這樣，當 `Saga` 需要處理某個事件時，我們不需要手動註冊，而是讓程式自動完成這些步驟。
+ * 這樣，當 `Saga` 需要處理某個事件時，我們不需要手動，而是讓程式自動完成這些步驟。
  */
-class HandlerScanner implements HandlerScannerInterface
+class HandlerScanner
 {
     /**
      * 儲存已經註冊過的事件處理器，避免重複註冊
@@ -58,14 +57,14 @@ class HandlerScanner implements HandlerScannerInterface
                 // 檢查該方法是否有使用 `#[EventHandler]` 註解
                 foreach ($method->getAttributes() as $attribute) {
                    
-                        echo "✅ Registering Saga EventHandler: $class::{$method->getName()}\n";
+                        //echo "✅ Registering Saga EventHandler: $class::{$method->getName()}\n";
 
                         // 透過 `Reflection` 取得該方法處理的事件類型
                         $eventType = $this->getEventTypeFromMethod($class, $method->getName());
 
                         // ✅ 確保不重複註冊相同的 `EventHandler`
                         if ($eventType && !isset($this->registeredEventHandlers[$eventType][$method->getName()])) {
-                            echo " [✔] Registered EventHandler for event: $eventType -> $class::{$method->getName()}\n";
+                            //echo " [✔] Registered EventHandler for event: $eventType -> $class::{$method->getName()}\n";
 
                             // 註冊到 `EventBus`
                             $eventBus->registerHandler($eventType, [$instance, $method->getName()]);
@@ -92,7 +91,7 @@ class HandlerScanner implements HandlerScannerInterface
         $relativePath = str_replace('\\', '/', str_replace('App\\', '', $namespace));
         $directory = $baseDir . '/' . $relativePath;
 
-        echo "Scanning directory: $directory\n"; // ✅ Debug 訊息，確認目錄位置
+        //echo "Scanning directory: $directory\n"; // ✅ Debug 訊息，確認目錄位置
 
         // 確保目錄存在，否則返回空陣列
         if (!is_dir($directory)) {

@@ -5,6 +5,9 @@ namespace SDPMlab\Anser\Service;
 use SDPMlab\Anser\Service\ServiceSettings;
 use GuzzleHttp\HandlerStack;
 use SDPMlab\Anser\Exception\ActionException;
+
+use GuzzleHttp\Client;
+
 class ServiceList
 {
 

@@ -1,54 +1,75 @@
 <?php
+
 require_once __DIR__ . '/vendor/autoload.php';
 
-use App\Framework\MessageQueue\RabbitMQConnection;
+use Workerman\Worker;
+use App\Framework\EventBus;
+use App\Framework\EventStore\EventStoreDB;
 use App\Framework\MessageQueue\MessageBus;
+use App\Framework\MessageQueue\RabbitMQConnection;
 use App\Events\OrderCreateRequestedEvent;
+use Dotenv\Dotenv;
+
+// 載入環境變數
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
 // 設定適當的標頭
 header("Content-Type: application/json");
 
-// 確保是 POST 請求
+// 創建 Worker 實例，監聽端口 9000
+$worker = new Worker("http://0.0.0.0:9000");  // Workerman 服務監聽端口
+$worker->count = 10; // 設置為 10 個進程，可以根據需要調整
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(["error" => "Method Not Allowed"]);
-    exit;
-}
-
-
-// 讀取請求的 `raw JSON body`
-$input = json_decode(file_get_contents('php://input'), true);
-
-// 確保 `productList` 存在並且是陣列
-
-if (!isset($input) || !is_array($input)) {
-    http_response_code(400);
-    echo json_encode(["error" => "Invalid request: productList is required and must be an array"]);
-    exit;
-}
-
-
-// 連接 RabbitMQ
-try {
-    $rabbitConnection = new RabbitMQConnection('rabbitmq', 5672, 'root', 'root');
-    $channel = $rabbitConnection->getChannel();
-} catch (\Exception $e) {
-    http_response_code(500);
-    echo json_encode(["error" => "RabbitMQ connection failed", "details" => $e->getMessage()]);
-    exit;
-}
-
-// 初始化 MessageBus
+// 在 Worker 啟動時建立 RabbitMQ 連線和 EventBus
+$rabbitMQ = new RabbitMQConnection(
+    $_ENV['RABBITMQ_HOST'],
+    $_ENV['RABBITMQ_PORT'],
+    $_ENV['RABBITMQ_USER'],
+    $_ENV['RABBITMQ_PASSWORD']
+);
+$channel = $rabbitMQ->getChannel();
 $messageBus = new MessageBus($channel);
+$eventStoreDB = new EventStoreDB(
+    $_ENV['EVENTSTORE_HOST'],
+    $_ENV['EVENTSTORE_PORT'],
+    $_ENV['EVENTSTORE_USER'],
+    $_ENV['EVENTSTORE_PASSWORD']
+);
+$eventBus = new EventBus($messageBus, $eventStoreDB);
 
-// 發送事件 **只包含 productList**
-// 發送事件 (確保 `productList` 為陣列)
-$messageBus->publishMessage('events', json_encode([
-    'type' => OrderCreateRequestedEvent::class,
-    'data' => [
-        'productList' => array_values($input) // ✅ 確保是陣列
-    ]
-]));
+// 持續運行並處理來自 HTTP 請求的事件
+$worker->onMessage = function ($connection, $data) use ($eventBus) {
+    // 記錄收到的原始數據
+    error_log("Received data: " . $data);
 
-echo json_encode(["message" => "Event sent successfully"]);
+    // 嘗試解析數據
+    $input = json_decode($data, true);
+
+    // 檢查解析結果，並查看是否為陣列
+    if (!is_array($input)) {
+        // 返回錯誤消息並顯示收到的原始數據
+        $connection->send(json_encode([
+            "error" => "Invalid request: Data must be an array", 
+            "received_data" => $data  // 返回原始數據以供調試
+        ]));
+        return;
+    }
+
+    // 確保資料格式正確，這是你的業務邏輯要求
+    if (!isset($input[0]['p_key']) || !isset($input[0]['price']) || !isset($input[0]['amount'])) {
+        $connection->send(json_encode(["error" => "Invalid data format: Missing required fields"]));
+        return;
+    }
+
+    // 發送事件到 RabbitMQ 和 EventStoreDB
+    $eventBus->publish(OrderCreateRequestedEvent::class, [
+        'productList' => $input  // 直接將 input 資料作為 productList 發送
+    ]);
+
+    // 返回成功訊息
+    $connection->send(json_encode(["message" => "Event sent successfully"]));
+};
+
+// 啟動 Worker
+Worker::runAll();

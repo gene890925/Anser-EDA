@@ -1,0 +1,53 @@
+2025-04-15 11:24:49 pid:1 TypeError: array_values(): Argument #1 ($array) must be of type array, null given in C:\Users\GE\Desktop\Anser_Choreography\worker.php:29
+Stack trace:
+#0 C:\Users\GE\Desktop\Anser_Choreography\worker.php(29): array_values(NULL)
+#1 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Connection\TcpConnection.php(653): {closure}(Object(Workerman\Connection\TcpConnection), Object(Workerman\Protocols\Http\Request))
+#2 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Events\Select.php(311): Workerman\Connection\TcpConnection->baseRead(Resource id #72)
+#3 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(1569): Workerman\Events\Select->loop()
+#4 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(1486): Workerman\Worker::forkWorkersForWindows()
+#5 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(561): Workerman\Worker::forkWorkers()
+#6 C:\Users\GE\Desktop\Anser_Choreography\worker.php(36): Workerman\Worker::runAll()
+#7 {main}
+2025-04-15 11:25:57 pid:1 Worker process terminated
+2025-04-15 11:26:56 pid:1 TypeError: array_values(): Argument #1 ($array) must be of type array, null given in C:\Users\GE\Desktop\Anser_Choreography\worker.php:31
+Stack trace:
+#0 C:\Users\GE\Desktop\Anser_Choreography\worker.php(31): array_values(NULL)
+#1 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Connection\TcpConnection.php(653): {closure}(Object(Workerman\Connection\TcpConnection), Object(Workerman\Protocols\Http\Request))
+#2 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Events\Select.php(311): Workerman\Connection\TcpConnection->baseRead(Resource id #72)
+#3 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(1569): Workerman\Events\Select->loop()
+#4 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(1486): Workerman\Worker::forkWorkersForWindows()
+#5 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(561): Workerman\Worker::forkWorkers()
+#6 C:\Users\GE\Desktop\Anser_Choreography\worker.php(38): Workerman\Worker::runAll()
+#7 {main}
+2025-04-15 11:27:44 pid:1 Worker process terminated
+2025-04-15 11:29:59 pid:1 Worker process terminated
+2025-04-15 11:35:44 pid:1 TypeError: array_values(): Argument #1 ($array) must be of type array, null given in C:\Users\GE\Desktop\Anser_Choreography\worker.php:32
+Stack trace:
+#0 C:\Users\GE\Desktop\Anser_Choreography\worker.php(32): array_values(NULL)
+#1 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Connection\TcpConnection.php(653): {closure}(Object(Workerman\Connection\TcpConnection), Object(Workerman\Protocols\Http\Request))
+#2 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Events\Select.php(311): Workerman\Connection\TcpConnection->baseRead(Resource id #72)
+#3 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(1569): Workerman\Events\Select->loop()
+#4 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(1486): Workerman\Worker::forkWorkersForWindows()
+#5 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(561): Workerman\Worker::forkWorkers()
+#6 C:\Users\GE\Desktop\Anser_Choreography\worker.php(40): Workerman\Worker::runAll()
+#7 {main}
+2025-04-15 11:38:49 pid:1 TypeError: array_values(): Argument #1 ($array) must be of type array, null given in C:\Users\GE\Desktop\Anser_Choreography\worker.php:35
+Stack trace:
+#0 C:\Users\GE\Desktop\Anser_Choreography\worker.php(35): array_values(NULL)
+#1 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Connection\TcpConnection.php(653): {closure}(Object(Workerman\Connection\TcpConnection), Object(Workerman\Protocols\Http\Request))
+#2 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Events\Select.php(311): Workerman\Connection\TcpConnection->baseRead(Resource id #72)
+#3 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(1569): Workerman\Events\Select->loop()
+#4 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(1486): Workerman\Worker::forkWorkersForWindows()
+#5 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(561): Workerman\Worker::forkWorkers()
+#6 C:\Users\GE\Desktop\Anser_Choreography\worker.php(43): Workerman\Worker::runAll()
+#7 {main}
+2025-04-15 11:45:38 pid:1 TypeError: array_values(): Argument #1 ($array) must be of type array, null given in C:\Users\GE\Desktop\Anser_Choreography\worker.php:35
+Stack trace:
+#0 C:\Users\GE\Desktop\Anser_Choreography\worker.php(35): array_values(NULL)
+#1 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Connection\TcpConnection.php(653): {closure}(Object(Workerman\Connection\TcpConnection), Object(Workerman\Protocols\Http\Request))
+#2 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Events\Select.php(311): Workerman\Connection\TcpConnection->baseRead(Resource id #72)
+#3 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(1569): Workerman\Events\Select->loop()
+#4 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(1486): Workerman\Worker::forkWorkersForWindows()
+#5 C:\Users\GE\Desktop\Anser_Choreography\vendor\workerman\workerman\Worker.php(561): Workerman\Worker::forkWorkers()
+#6 C:\Users\GE\Desktop\Anser_Choreography\worker.php(43): Workerman\Worker::runAll()
+#7 {main}

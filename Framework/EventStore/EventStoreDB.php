@@ -10,15 +10,16 @@ class EventStoreDB
     private Client $httpClient;
     private string $eventStoreUrl;
 
-    public function __construct()
+    public function __construct(string $host, int $port, string $username, string $password)
     {
-        $this->eventStoreUrl = 'http://localhost:2113'; // 確保這是你的 EventStoreDB 伺服器 URL
+        $this->eventStoreUrl = "http://{$host}:{$port}";
         $this->httpClient = new Client([
+            'base_uri' => $this->eventStoreUrl,
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
             ],
-            'auth' => ['admin', 'changeit'], // 預設 EventStoreDB 的帳號密碼
+            'auth' => [$username, $password],
         ]);
     }
 

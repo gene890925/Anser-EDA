@@ -44,7 +44,7 @@ class MessageBus
      */
     public function publishEvent(string $eventType, array $eventData)
     {
-       echo $routingKey = substr(strrchr($eventType, '\\'), 1);
+        $routingKey = substr(strrchr($eventType, '\\'), 1);
     
         $message = new AMQPMessage(json_encode([
             'type' => $eventType,

@@ -1,54 +1,88 @@
 <?php
 namespace App\Framework\MessageQueue;
 
+use Hyperf\Logger\LoggerFactory;
+use Psr\Container\ContainerInterface;
+
 class Consumer
 {
     private $channel;
     private $eventBus;
+    private $startTime;
+    private $firstMessageProcessed = false;
+    private $logFile;
+    private $queueName;
+    private $logger;
 
-    public function __construct($channel, $eventBus)
+    public function __construct($channel, $eventBus, ContainerInterface $container)
     {
         $this->channel = $channel;
         $this->eventBus = $eventBus;
+        $this->startTime = microtime(true);
+        $this->logFile = dirname(__DIR__, 2) . '/Logs/consumer.log';
+        $this->logger = $container->get(LoggerFactory::class)->get('performance');
+        
+        // 確保日誌目錄存在
+        if (!is_dir(dirname($this->logFile))) {
+            mkdir(dirname($this->logFile), 0777, true);
+        }
+
+        // 記錄容器啟動時間
+        $this->logger->info('Container started at: ' . date('Y-m-d H:i:s'));
+    }
+
+    private function log($message)
+    {
+        file_put_contents($this->logFile, $message . PHP_EOL, FILE_APPEND);
     }
 
     public function consume(string $queue)
     {
-        echo " [*] Waiting for messages in queue: $queue\n";
-
+        $this->queueName = $queue;
+        
         $callback = function ($msg) {
+            if (!$this->firstMessageProcessed) {
+                $timeToFirstMessage = microtime(true) - $this->startTime;
+                $this->logger->info(sprintf(
+                    'Queue: %s - Time to first message: %.2f seconds',
+                    $this->queueName,
+                    $timeToFirstMessage
+                ));
+                $this->firstMessageProcessed = true;
+            }
+
             $eventData = json_decode($msg->body, true);
             if (!$eventData || !isset($eventData['type'])) {
-                echo " [x] Invalid message format\n";
                 return;
             }
 
             $eventType = $eventData['type'];
 
-            echo " [x] Received event: $eventType\n";
-
             if (class_exists($eventType)) {
                 $eventObject = new $eventType(...array_values($eventData['data'])); 
                 $this->eventBus->dispatch($eventObject);
+                
+                // 記錄交易完成時間
+                $totalTime = microtime(true) - $this->startTime;
+                $this->logger->info(sprintf(
+                    'Queue: %s - Transaction completed in %.2f seconds',
+                    $this->queueName,
+                    $totalTime
+                ));
             }
 
-            //確保 `basic_ack()` 只執行一次
             if ($msg->has('delivery_tag')) {
-                echo " [x] Acknowledging message: $eventType\n";
-               $this->channel->basic_ack($msg->get('delivery_tag'));
-            } else {
-                echo " [x] Warning: Message does not have a valid delivery tag.\n";
+                $this->channel->basic_ack($msg->get('delivery_tag'));
             }
         };
 
-        //確保 `no_ack = false`，RabbitMQ 只發送一次
         $this->channel->basic_consume($queue, '', false, false, false, false, $callback);
 
         while (true) {
             try {
                 $this->channel->wait();
             } catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e) {
-                echo " [x] Timeout: " . $e->getMessage() . "\n";
+                // 忽略超時異常
             }
         }
     }

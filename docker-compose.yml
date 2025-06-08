@@ -20,8 +20,8 @@ services:
             RABBITMQ_PASS: root
             EVENTSTOREDB_HOST: eventstoredb
             EVENTSTOREDB_PORT: 2113
-            PHP_DISPLAY_ERRORS: "On"           # 開啟錯誤顯示
-            PHP_ERROR_REPORTING: "E_ALL"      # 顯示所有錯誤
+            #PHP_DISPLAY_ERRORS: "On"           # 開啟錯誤顯示
+            #PHP_ERROR_REPORTING: "E_ALL"      # 顯示所有錯誤
         networks:
             - anser_project_network
     rabbitmq:
