@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Framework;
+namespace SDPMlab\AnserEDA;
 
-use App\Framework\EventBus;
-use App\Framework\MessageQueue\MessageBus;
+use SDPMlab\AnserEDA\EventBus;
+use SDPMlab\AnserEDA\MessageQueue\MessageBus;
 
 interface HandlerScannerInterface
 {

@@ -2,14 +2,13 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use App\Framework\EventBus;
-use App\Framework\EventStore\EventStoreDB;
-use App\Framework\MessageQueue\MessageBus;
-use App\Framework\MessageQueue\Consumer;
-use App\Framework\MessageQueue\RabbitMQConnection;
-use App\Framework\HandlerScanner;
+use SDPMlab\AnserEDA\EventBus;
+use SDPMlab\AnserEDA\EventStore\EventStoreDB;
+use SDPMlab\AnserEDA\MessageQueue\MessageBus;
+use SDPMlab\AnserEDA\MessageQueue\Consumer;
+use SDPMlab\AnserEDA\MessageQueue\RabbitMQConnection;
+use SDPMlab\AnserEDA\HandlerScanner;
 use Dotenv\Dotenv;
-use Psr\Container\ContainerInterface;
 
 // 載入環境變數
 $dotenv = Dotenv::createImmutable(__DIR__);

@@ -1,8 +1,8 @@
 <?php
-namespace App\Framework;
+namespace SDPMlab\AnserEDA;
 
-use App\Framework\MessageQueue\MessageBus;
-use App\Framework\EventStore\EventStoreDB;
+use SDPMlab\AnserEDA\MessageQueue\MessageBus;
+use SDPMlab\AnserEDA\EventStore\EventStoreDB;
 
 class EventBus
 {

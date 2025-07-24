@@ -10,11 +10,6 @@
     <arg name="tab-width" value="4"/>
     <arg name="report-width" value="120"/>
 
-    <rule ref="PSR12">
-        <!-- Rule requires minimal PHP 7.1 version -->
-        <exclude name="PSR12.Properties.ConstantVisibility.NotFound"/>
-    </rule>
-
     <rule ref="PEAR.Functions.ValidDefaultValue">
         <!-- We should preserve BC with possible child classes until next major version -->
         <exclude-pattern>PhpAmqpLib/Helper/Protocol/Protocol091.php</exclude-pattern>
@@ -33,6 +28,9 @@
         <exclude-pattern>PhpAmqpLib/Connection/AMQPSocketConnection.php</exclude-pattern>
         <exclude-pattern>PhpAmqpLib/Connection/AMQPSSLConnection.php</exclude-pattern>
         <exclude-pattern>PhpAmqpLib/Connection/AMQPStreamConnection.php</exclude-pattern>
+        <exclude-pattern>PhpAmqpLib/Connection/AMQPLazyConnection.php</exclude-pattern>
+        <exclude-pattern>PhpAmqpLib/Connection/AMQPLazySocketConnection.php</exclude-pattern>
+        <exclude-pattern>PhpAmqpLib/Connection/AMQPLazySSLConnection.php</exclude-pattern>
         <exclude-pattern>PhpAmqpLib/Connection/AbstractConnection.php</exclude-pattern>
         <exclude-pattern>PhpAmqpLib/Message/AMQPMessage.php</exclude-pattern>
         <exclude-pattern>PhpAmqpLib/Helper/Protocol/Wait091.php</exclude-pattern>

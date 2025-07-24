@@ -3,73 +3,62 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 use Workerman\Worker;
-use App\Framework\EventBus;
-use App\Framework\EventStore\EventStoreDB;
-use App\Framework\MessageQueue\MessageBus;
-use App\Framework\MessageQueue\RabbitMQConnection;
+use SDPMlab\AnserEDA\EventBus;
+use SDPMlab\AnserEDA\EventStore\EventStoreDB;
+use SDPMlab\AnserEDA\MessageQueue\MessageBus;
+use SDPMlab\AnserEDA\MessageQueue\RabbitMQConnection;
 use App\Events\OrderCreateRequestedEvent;
-use Dotenv\Dotenv;
 
-// 載入環境變數
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
-// 設定適當的標頭
 header("Content-Type: application/json");
 
-// 創建 Worker 實例，監聽端口 9000
-$worker = new Worker("http://0.0.0.0:9000");  // Workerman 服務監聽端口
-$worker->count = 10; // 設置為 10 個進程，可以根據需要調整
-
-// 在 Worker 啟動時建立 RabbitMQ 連線和 EventBus
-$rabbitMQ = new RabbitMQConnection(
-    $_ENV['RABBITMQ_HOST'],
-    $_ENV['RABBITMQ_PORT'],
-    $_ENV['RABBITMQ_USER'],
-    $_ENV['RABBITMQ_PASSWORD']
-);
+$rabbitMQ = new RabbitMQConnection('rabbitmq', 5672, 'root', 'root');
 $channel = $rabbitMQ->getChannel();
+
 $messageBus = new MessageBus($channel);
-$eventStoreDB = new EventStoreDB(
-    $_ENV['EVENTSTORE_HOST'],
-    $_ENV['EVENTSTORE_PORT'],
-    $_ENV['EVENTSTORE_USER'],
-    $_ENV['EVENTSTORE_PASSWORD']
-);
+$eventStoreDB = new EventStoreDB('eventstoredb',2113,'admin','changeit');
 $eventBus = new EventBus($messageBus, $eventStoreDB);
 
-// 持續運行並處理來自 HTTP 請求的事件
-$worker->onMessage = function ($connection, $data) use ($eventBus) {
-    // 記錄收到的原始數據
-    error_log("Received data: " . $data);
+// 嘗試解析數據
+$data = file_get_contents('php://input');
+$input = json_decode($data, true);
 
-    // 嘗試解析數據
-    $input = json_decode($data, true);
 
-    // 檢查解析結果，並查看是否為陣列
-    if (!is_array($input)) {
-        // 返回錯誤消息並顯示收到的原始數據
-        $connection->send(json_encode([
-            "error" => "Invalid request: Data must be an array", 
-            "received_data" => $data  // 返回原始數據以供調試
-        ]));
-        return;
-    }
-
-    // 確保資料格式正確，這是你的業務邏輯要求
-    if (!isset($input[0]['p_key']) || !isset($input[0]['price']) || !isset($input[0]['amount'])) {
-        $connection->send(json_encode(["error" => "Invalid data format: Missing required fields"]));
-        return;
-    }
-
-    // 發送事件到 RabbitMQ 和 EventStoreDB
-    $eventBus->publish(OrderCreateRequestedEvent::class, [
-        'productList' => $input  // 直接將 input 資料作為 productList 發送
+// 檢查解析結果，並查看是否為陣列
+if (!is_array($input)) {
+    echo json_encode([
+        "error" => "Invalid request: Data must be an array",
+        "received_data" => $data
     ]);
+    http_response_code(400);
+    return;
+}
 
-    // 返回成功訊息
-    $connection->send(json_encode(["message" => "Event sent successfully"]));
-};
+// 檢查每一個商品欄位
+foreach ($input as $item) {
+    if (!isset($item['p_key']) || !isset($item['price']) || !isset($item['amount'])) {
+        echo json_encode(["error" => "Invalid data format: Missing required fields in one of the products"]);
+        http_response_code(400);
+        return;
+    }
+    if (!is_int($item['price'])) {
+        echo json_encode(["error" => "Invalid data format: price must be int in all products"]);
+        http_response_code(400);
+        return;
+    }
+}
 
-// 啟動 Worker
-Worker::runAll();
+// 確保資料格式正確，這是你的業務邏輯要求
+if (!isset($input[0]['p_key']) || !isset($input[0]['price']) || !isset($input[0]['amount'])) {
+    echo json_encode(["error" => "Invalid data format: Missing required fields"]);
+    http_response_code(400);
+    return;
+}
+
+// 發送事件到 RabbitMQ 和 EventStoreDB
+$eventBus->publish(OrderCreateRequestedEvent::class, [
+    'productList' => $input  // 直接將 input 資料作為 productList 發送
+]);
+
+// 返回成功訊息
+echo json_encode(["message" => "Event sent successfully","data"=>$input]);
+
