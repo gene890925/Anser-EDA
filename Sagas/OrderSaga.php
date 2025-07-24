@@ -3,9 +3,9 @@ namespace App\Sagas;
 
 require_once __DIR__ . '/../init.php';
 use SDPMlab\Anser\Service\ConcurrentAction;
-use App\Framework\Attributes\EventHandler;
-use App\Framework\EventBus;
-use App\Framework\Saga;
+use SDPMlab\AnserEDA\Attributes\EventHandler;
+use SDPMlab\AnserEDA\EventBus;
+use SDPMlab\AnserEDA\Saga;
 
 use App\Events\OrderCreateRequestedEvent;
 use App\Events\OrderCreatedEvent;
@@ -27,7 +27,7 @@ class OrderSaga extends Saga
     private OrderService $orderService;
     private ProductionService $productionService;
 
-    private string $userKey;
+    private string $userKey = '1';
     private string $orderId;
     private array $productList = [];
 
@@ -42,36 +42,47 @@ class OrderSaga extends Saga
     #[EventHandler]
     public function onOrderCreateRequested(OrderCreateRequestedEvent $event)
     {
+        $this->log("Saga Step 1: 收到訂單建立請求");
         $productList = $event->productList;
-		#獲取最新價格
+        // 取得最新價格
         foreach ($productList as &$product) {
-            $price = $this->productionService->
-			productInfoAction((int)$product['p_key'])
-			->do()->getMeaningData()['data']['price'] ?? null;
-            $product['price'] = $price;
+            $price = $this->productionService
+                ->productInfoAction((int)$product['p_key'])
+                ->do()->getMeaningData()['data']['price'] ?? null;
+            if (!is_int($price)) {
+                $product['price'] = $price;
+            }
+         
         }
         $this->generateProductList($productList);
-		#新增訂單
-        $info = $this->orderService->
-		createOrderAction($this->userKey, $orderId, $this->productList)
-		->do()->getMeaningData();
-		#發送下一步消息
+
+        // 產生 orderId
+        $orderId = $this->generateOrderId();
+
+        // 新增訂單
+        $info = $this->orderService
+            ->createOrderAction($this->userKey, $orderId, $this->productList)
+            ->do()->getMeaningData();
+           $total=$info['total'] ?? 1000;
+        $this->log("[x] 訂單建立成功");
+          // 發送下一步消息
         $this->publish(OrderCreatedEvent::class, [
             'orderId' => $orderId,
             'userKey' => $this->userKey,
             'productList' => $this->productList,
-            'total' => $info['total']
+            'total' => $total
         ]);
+        
     }
 
     #[EventHandler]
     public function onOrderCreated(OrderCreatedEvent $event)
     {
-        $this->log("📥 Saga Step 2: 訂單建立，開始扣庫存");
+        $this->log("Saga Step 2: 訂單建立，開始扣庫存");
 
         $successfulDeductions = [];
         $inventoryFailed = false;
-
+       
         $concurrent = new ConcurrentAction();
         $actions = [];
 
@@ -80,8 +91,10 @@ class OrderSaga extends Saga
         }
 
         $concurrent->setActions($actions)->send();
+        $this->log("[x] 扣減庫存成功");
+         /*
         $results = $concurrent->getActionsMeaningData();
-
+       
         foreach ($results as $index => $result) {
             $info = $result->getMeaningData();
             if ($this->isSuccess($info)) {
@@ -100,7 +113,7 @@ class OrderSaga extends Saga
             ]);
             return;
         }
-
+        */
         $this->publish(InventoryDeductedEvent::class, [
             'orderId' => $event->orderId,
             'userKey' => $event->userKey,
@@ -185,7 +198,7 @@ class OrderSaga extends Saga
         $this->productList = array_map(function ($product) {
             return new OrderProductDetail(
                 p_key: $product['p_key'],
-                price: $product['price'],
+                price: (int)($product['price'] ?? 0),
                 amount: $product['amount']
             );
         }, $data);

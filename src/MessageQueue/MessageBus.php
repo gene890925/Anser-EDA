@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Framework\MessageQueue;
+namespace SDPMlab\AnserEDA\MessageQueue;
 
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Channel\AMQPChannel;

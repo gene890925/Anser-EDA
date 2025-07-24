@@ -1,7 +1,7 @@
 <?php
-namespace App\Framework;
+namespace SDPMlab\AnserEDA;
 
-use App\Framework\EventBus;
+use SDPMlab\AnserEDA\EventBus;
 
 /**
  * 抽象 Saga 類別

@@ -37,6 +37,10 @@ abstract class AMQPAbstractCollection implements \Iterator, \ArrayAccess
     const T_TABLE = 16;
 
     const T_BYTES = 17;
+
+    const T_FLOAT = 18;
+    const T_DOUBLE = 19;
+
     /**
      * @var string
      */
@@ -46,6 +50,7 @@ abstract class AMQPAbstractCollection implements \Iterator, \ArrayAccess
      * Field types messy mess http://www.rabbitmq.com/amqp-0-9-1-errata.html#section_3
      * Default behaviour is to use rabbitMQ compatible field-set
      * Define AMQP_STRICT_FLD_TYPES=true to use strict AMQP instead
+     * @var array<int, string>
      */
     private static $types_080 = array(
         self::T_INT_LONG => 'I',
@@ -56,7 +61,7 @@ abstract class AMQPAbstractCollection implements \Iterator, \ArrayAccess
     );
 
     /**
-     * @var array
+     * @var array<int, string>
      */
     private static $types_091 = array(
         self::T_INT_SHORTSHORT => 'b',
@@ -67,6 +72,8 @@ abstract class AMQPAbstractCollection implements \Iterator, \ArrayAccess
         self::T_INT_LONG_U => 'i',
         self::T_INT_LONGLONG => 'L',
         self::T_INT_LONGLONG_U => 'l',
+        self::T_FLOAT => 'f',
+        self::T_DOUBLE => 'd',
         self::T_DECIMAL => 'D',
         self::T_TIMESTAMP => 'T',
         self::T_VOID => 'V',
@@ -79,13 +86,18 @@ abstract class AMQPAbstractCollection implements \Iterator, \ArrayAccess
     );
 
     /**
-     * @var array
+     * @var array<int, string>
      */
     private static $types_rabbit = array(
         self::T_INT_SHORTSHORT => 'b',
+        self::T_INT_SHORTSHORT_U => 'B',
         self::T_INT_SHORT => 's',
+        self::T_INT_SHORT_U => 'u',
         self::T_INT_LONG => 'I',
+        self::T_INT_LONG_U => 'i',
         self::T_INT_LONGLONG => 'l',
+        self::T_FLOAT => 'f',
+        self::T_DOUBLE => 'd',
         self::T_DECIMAL => 'D',
         self::T_TIMESTAMP => 'T',
         self::T_VOID => 'V',
@@ -196,11 +208,13 @@ abstract class AMQPAbstractCollection implements \Iterator, \ArrayAccess
         return $val;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return isset($this->data[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         $value = isset($this->data[$offset]) ? $this->data[$offset] : null;
@@ -208,11 +222,13 @@ abstract class AMQPAbstractCollection implements \Iterator, \ArrayAccess
         return is_array($value) ? $value[1] : $value;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->setValue($value, null, $offset);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         unset($this->data[$offset]);
@@ -236,9 +252,6 @@ abstract class AMQPAbstractCollection implements \Iterator, \ArrayAccess
         } elseif (is_null($val)) {
             $val = $this->encodeVoid();
         } elseif ($val instanceof \DateTimeInterface) {
-            $val = array(self::T_TIMESTAMP, $val->getTimestamp());
-        } elseif ($val instanceof \DateTime) {
-            // PHP <= 5.4 has no DateTimeInterface
             $val = array(self::T_TIMESTAMP, $val->getTimestamp());
         } elseif ($val instanceof AMQPDecimal) {
             $val = array(self::T_DECIMAL, $val);
@@ -467,26 +480,31 @@ abstract class AMQPAbstractCollection implements \Iterator, \ArrayAccess
         return $symbols[$symbol];
     }
 
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return current($this->data);
     }
 
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return key($this->data);
     }
 
+    #[\ReturnTypeWillChange]
     public function next()
     {
         next($this->data);
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         reset($this->data);
     }
 
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return key($this->data) !== null;

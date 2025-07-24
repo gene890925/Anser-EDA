@@ -44,6 +44,7 @@ class ComposerStaticInitff03fe99b1bb5687cd1ba26b0aa5ddad
             'SDPMlab\\Anser\\Orchestration\\' => 28,
             'SDPMlab\\Anser\\Exception\\' => 24,
             'SDPMlab\\Anser\\' => 14,
+            'SDPMlab\\AnserEDA\\' => 17,
         ),
         'R' => 
         array (
@@ -167,6 +168,10 @@ class ComposerStaticInitff03fe99b1bb5687cd1ba26b0aa5ddad
         'SDPMlab\\Anser\\' => 
         array (
             0 => __DIR__ . '/..' . '/sdpmlab/anser-action/src',
+        ),
+        'SDPMlab\\AnserEDA\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src',
         ),
         'Ramsey\\Uuid\\' => 
         array (

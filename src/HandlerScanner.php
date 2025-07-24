@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Framework;
+namespace SDPMlab\AnserEDA;
 
 use ReflectionClass;
 use ReflectionMethod;
-use App\Framework\EventBus;
+use SDPMlab\AnserEDA\EventBus;
 
 /**
  * Class HandlerScanner

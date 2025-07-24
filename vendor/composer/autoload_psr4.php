@@ -19,6 +19,7 @@ return array(
     'SDPMlab\\Anser\\Orchestration\\' => array($vendorDir . '/sdpmlab/anser/src/Orchestration'),
     'SDPMlab\\Anser\\Exception\\' => array($vendorDir . '/sdpmlab/anser/src/Exception'),
     'SDPMlab\\Anser\\' => array($vendorDir . '/sdpmlab/anser-action/src'),
+    'SDPMlab\\AnserEDA\\' => array($baseDir . '/src'),
     'Ramsey\\Uuid\\' => array($vendorDir . '/ramsey/uuid/src'),
     'Ramsey\\Collection\\' => array($vendorDir . '/ramsey/collection/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),

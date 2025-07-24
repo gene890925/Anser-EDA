@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 
-use App\Framework\MessageQueue\RabbitMQConnection;
+use SDPMlab\AnserEDA\MessageQueue\RabbitMQConnection;
 
 // ✅ **初始化 RabbitMQ 連線**
 $rabbitMQ = new RabbitMQConnection('127.0.0.1', 5672, 'root', 'root');

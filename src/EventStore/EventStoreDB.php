@@ -1,5 +1,5 @@
 <?php
-namespace App\Framework\EventStore;
+namespace SDPMlab\AnserEDA\EventStore;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
