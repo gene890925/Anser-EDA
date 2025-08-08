@@ -1,6 +1,5 @@
 <?php
 namespace App\Sagas;
-
 require_once __DIR__ . '/../init.php';
 use SDPMlab\Anser\Service\ConcurrentAction;
 use SDPMlab\AnserEDA\Attributes\EventHandler;
@@ -20,19 +19,14 @@ use Services\OrderService;
 use Services\ProductionService;
 use Services\Models\OrderProductDetail;
 
-class OrderSaga extends Saga
-{
-
+class OrderSaga extends Saga{
     private UserService $userService;
     private OrderService $orderService;
     private ProductionService $productionService;
-
     private string $userKey = '1';
     private string $orderId;
     private array $productList = [];
-
-    public function __construct(EventBus $eventBus)
-    {
+    public function __construct(EventBus $eventBus){
         parent::__construct($eventBus);
         $this->userService = new UserService();
         $this->orderService = new OrderService();
@@ -40,8 +34,7 @@ class OrderSaga extends Saga
     }
 
     #[EventHandler]
-    public function onOrderCreateRequested(OrderCreateRequestedEvent $event)
-    {
+    public function onOrderCreateRequested(OrderCreateRequestedEvent $event){
         $this->log("Saga Step 1: 收到訂單建立請求");
         $productList = $event->productList;
         // 取得最新價格
@@ -52,18 +45,15 @@ class OrderSaga extends Saga
             if (!is_int($price)) {
                 $product['price'] = $price;
             }
-         
         }
         $this->generateProductList($productList);
-
         // 產生 orderId
         $orderId = $this->generateOrderId();
-
         // 新增訂單
         $info = $this->orderService
             ->createOrderAction($this->userKey, $orderId, $this->productList)
             ->do()->getMeaningData();
-           $total=$info['total'] ?? 1000;
+        $total=$info['total'] ?? 1000;
         $this->log("[x] 訂單建立成功");
           // 發送下一步消息
         $this->publish(OrderCreatedEvent::class, [
@@ -71,8 +61,7 @@ class OrderSaga extends Saga
             'userKey' => $this->userKey,
             'productList' => $this->productList,
             'total' => $total
-        ]);
-        
+        ]);   
     }
 
     #[EventHandler]
@@ -132,7 +121,7 @@ class OrderSaga extends Saga
 		->do()->getMeaningData();
         if (!$this->isSuccess($info)) {
             $this->log("[x] 支付失敗，開始回滾");
-			#發送回滾訊行
+			#發送回滾訊息
             $this->compensate(RollbackInventoryEvent::class, [
                 'orderId' => $event->orderId,
                 'userKey' => $event->userKey,
@@ -153,9 +142,6 @@ class OrderSaga extends Saga
     {
         if ($event->success) {
             $this->log("✅ Saga Step 4: 訂單完成！");
-            $this->publish(OrderCompletedEvent::class, [
-                'orderId' => $event->orderId,
-            ]);
         }
     }
 

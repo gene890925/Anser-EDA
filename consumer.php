@@ -8,11 +8,6 @@ use SDPMlab\AnserEDA\MessageQueue\MessageBus;
 use SDPMlab\AnserEDA\MessageQueue\Consumer;
 use SDPMlab\AnserEDA\MessageQueue\RabbitMQConnection;
 use SDPMlab\AnserEDA\HandlerScanner;
-use Dotenv\Dotenv;
-
-// 載入環境變數
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
 
 //  **檢查是否有傳入 queue_name**
 if ($argc < 2) {
@@ -20,25 +15,11 @@ if ($argc < 2) {
 }
 
 $queueName = $argv[1]; // 傳入的佇列名稱
-
-//  **初始化 RabbitMQ 連線**
-$rabbitMQ = new RabbitMQConnection(
-    $_ENV['RABBITMQ_HOST'],
-    $_ENV['RABBITMQ_PORT'],
-    $_ENV['RABBITMQ_USER'],
-    $_ENV['RABBITMQ_PASSWORD']
-);
+$rabbitMQ = new RabbitMQConnection('127.0.0.1', 5672, 'root', 'root');
 $channel = $rabbitMQ->getChannel();
 $channel->basic_qos(null, 1000, null);  
-
-//  **初始化 MessageBus & EventBus**
 $messageBus = new MessageBus($channel);
-$eventStoreDB = new EventStoreDB(
-    $_ENV['EVENTSTORE_HOST'],
-    $_ENV['EVENTSTORE_PORT'],
-    $_ENV['EVENTSTORE_USER'],
-    $_ENV['EVENTSTORE_PASSWORD']
-);
+$eventStoreDB = new EventStoreDB('127.0.0.1',2113,'admin','changeit');
 $eventBus = new EventBus($messageBus, $eventStoreDB);
 
 $scanner = new HandlerScanner();
@@ -48,4 +29,5 @@ $scanner->scanAndRegisterHandlers('App\Sagas', $eventBus);
 echo " [*] Listening on queue: $queueName\n";
 $consumer = new Consumer($channel, $eventBus);
 $consumer->consume($queueName);
+
     
